@@ -1,5 +1,5 @@
 server:
-  port: 8443
+  port: 8445
 
 eureka:
   client:
@@ -8,7 +8,7 @@ eureka:
 
 spring:
   application:
-    name: geteway
+    name: geteway-admin
   rabbitmq:
     host: ${RABBIT_MQ_HOST:localhost}
     port: ${RABBIT_MQ_PORT:5672}
@@ -18,6 +18,11 @@ spring:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
     #password: ${REDIS_PASSWORD:}
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/sc_gateway
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
 
   zipkin:
     enabled: true
@@ -28,31 +33,6 @@ spring:
     http:
       legacy:
         enabled: true
-  #jwt密码
-  security:
-    oauth2:
-      jwt:
-        signingKey: 123456
-  cloud:
-    gateway:
-      default-filters:
-      - name: Retry
-        args:
-          retries: 3
-          statuses: BAD_GATEWAY
-      - AddResponseHeader=X-Response-Default-Foo, Default-Bar
-      - name: RequestRateLimiter
-        args:
-          redis-rate-limiter.replenishRate: 1  #令牌桶的容积
-          redis-rate-limiter.burstCapacity: 1  #流速 每秒
-          rate-limiter: "#{@defaultRedisRateLimiter}"  #SPEL表达式去的对应的bean
-          key-resolver: "#{@remoteAddressKeyResolver}" #SPEL表达式去的对应的bean
-
-#网关白名单，无需要签权url
-gate:
-  ignore:
-    authentication:
-      startWith: /oauth,/open
 
 management:
   endpoints:
